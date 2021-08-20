@@ -4,24 +4,24 @@ const { signToken } = require('../utils/auth');
 
 const resolvers = {
   Query: {
-    users: async () => {
-      console.log('Query.users() called!');
-      return await User.find({}).populate('savedBooks');
-    },
+    // users: async () => {
+    //   console.log('Query.users() called!');
+    //   return await User.find({}).populate('savedBooks');
+    // },
     user: async (parent, { id }) => {
       console.log('Query.user() called:', id);
       return await User.findOne({ _id: id }).populate('savedBooks');
     },
-    userByName: async (parent, { name }) => {
+    userByName: async (parent, { username }) => {
       console.log('Query.userByName() called:', name);
-      return await User.findOne({ username: name }).populate('savedBooks');
+      return await User.findOne({ username }).populate('savedBooks');
     },
-    savedBooks: async (parent, { username }) => {
-      console.log('Query.savedBooks() called:', username);
-      const params = username ? { username } : {};
+    // savedBooks: async (parent, { username }) => {
+    //   console.log('Query.savedBooks() called:', username);
+    //   const params = username ? { username } : {};
 
-      return (await User.find(params)).savedBooks;
-    },
+    //   return (await User.find(params)).savedBooks;
+    // },
     me: async (parent, args, context) => {
       console.log('Query.me() called:', context);
       if (context.user) {
@@ -80,35 +80,30 @@ const resolvers = {
           title,
         });
 
-        // Should this be findOneAndUpdate()? ...
-        await User.findByIdAndUpdate(
+        const updatedUser = await User.findOneAndUpdate(
           { _id: context.user._id },
-          { $push: { savedBooks: book } }
+          { $addToSet: { savedBooks: book } },
+          { new: true, runValidators: true },
         );
 
-        return book;
+        return updatedUser;
       }
       throw new AuthenticationError('You need to be logged in!');
     },
     deleteBook: async (parent, { bookId }, context) => {
       console.log('deleteBook called:', bookId);
       if (context.user) {
-        // We want to pull this book out of this User before deleting it.
-        const user = await User.findOne({
-          _id: context.user._id,
-        });
-
-        const book = user.savedBooks.find(b => b.bookId === bookId);
-
-        // Should this be findByIdAndUpdate()? ...
-        await User.findOneAndUpdate(
+        const updatedUser = await User.findOneAndUpdate(
           { _id: context.user._id },
-          { $pull: { savedBooks: bookId } }
+          { $pull: { savedBooks: bookId } },
+          { new: true },
         );
 
-        return book;
+        return updatedUser;
       }
       throw new AuthenticationError('You need to be logged in!');
     },
   },
 };
+
+module.exports = resolvers;
