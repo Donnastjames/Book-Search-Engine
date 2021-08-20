@@ -1,6 +1,5 @@
 const { AuthenticationError } = require('apollo-server-express');
 const { User } = require('../models');
-const { Book } = require('../models/Book');
 const { signToken } = require('../utils/auth');
 
 const resolvers = {
@@ -20,8 +19,8 @@ const resolvers = {
     savedBooks: async (parent, { username }) => {
       console.log('Query.savedBooks() called:', username);
       const params = username ? { username } : {};
-      // I'm confused by this ...
-      return await Book.find(params);
+
+      return (await User.find(params)).savedBooks;
     },
     me: async (parent, args, context) => {
       console.log('Query.me() called:', context);
@@ -67,11 +66,12 @@ const resolvers = {
         link,
         title,
       },
-      context
+      context,
     ) => {
-      console.log('saveBook() called', authors, description, bookId, image, link, title);
+      console.log('saveBook() called:', authors, description, bookId, image, link, title);
       if (context.user) {
-        const book = await Book.create({
+        // MongoDB "push" instead of create
+        const book = new bookSchema({
           authors,
           description,
           bookId,
@@ -80,25 +80,30 @@ const resolvers = {
           title,
         });
 
-        await User.findOneAndUpdate(
+        // Should this be findOneAndUpdate()? ...
+        await User.findByIdAndUpdate(
           { _id: context.user._id },
-          { $addToSet: { savedBooks: book._id } }
+          { $push: { savedBooks: book } }
         );
 
         return book;
       }
       throw new AuthenticationError('You need to be logged in!');
     },
-    deleteBook: async (parent, { id }, context) => {
-      console.log('deleteBook called:', id);
+    deleteBook: async (parent, { bookId }, context) => {
+      console.log('deleteBook called:', bookId);
       if (context.user) {
-        const book = await Book.findOneAndDelete({
-          _id: id,
+        // We want to pull this book out of this User before deleting it.
+        const user = await User.findOne({
+          _id: context.user._id,
         });
 
+        const book = user.savedBooks.find(b => b.bookId === bookId);
+
+        // Should this be findByIdAndUpdate()? ...
         await User.findOneAndUpdate(
           { _id: context.user._id },
-          { $pull: { savedBooks: book._id } }
+          { $pull: { savedBooks: bookId } }
         );
 
         return book;
