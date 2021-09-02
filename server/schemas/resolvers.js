@@ -116,20 +116,21 @@ const resolvers = {
       }
       throw new AuthenticationError('You need to be logged in!');
     },
-    deleteBook: async (parent, { bookId }, context) => {
-      console.log('deleteBook called:', bookId);
+    removeBook: async (parent, { bookId }, context) => {
+      myLog('removeBook()');
+      myLog('bookId', bookId);
       if (context.user) {
         const updatedUser = await User.findOneAndUpdate(
           { _id: context.user._id },
-          { $pull: { savedBooks: bookId } },
+          { $pull: { savedBooks: { bookId } } },
           { new: true },
         );
-
+        myLog('updatedUser', updatedUser);
         return updatedUser;
       }
       throw new AuthenticationError('You need to be logged in!');
     },
-    // TODO: The following is for debugging and can be removed ...
+    // TODO: The following are for debugging and can be removed ...
     saveBookForUser: async (
       parent,
       {
@@ -166,6 +167,20 @@ const resolvers = {
           { _id: userId },
           { $addToSet: { savedBooks: book } },
           { new: true, runValidators: true },
+        );
+        myLog('updatedUser', updatedUser);
+        return updatedUser;
+      }
+      throw new AuthenticationError('You need to be logged in!');
+    },
+    removeBookForUser: async (parent, { userId, bookId }, context) => {
+      myLog('removeBookForUser()', userId);
+      myLog('bookId', bookId);
+      if (userId) {
+        const updatedUser = await User.findOneAndUpdate(
+          { _id: userId },
+          { $pull: { savedBooks: { bookId } } },
+          { new: true },
         );
         myLog('updatedUser', updatedUser);
         return updatedUser;
