@@ -5,7 +5,7 @@ const { myLog } = require('../utils/my_utils');
 
 const resolvers = {
   Query: {
-    // TODO: The following 2 methods are only to help debug, and can be removed ...
+    // TODO: The following 3 methods are only to help debug, and can be removed ...
     users: async () => {
       myLog('users()');
       const theUsers = await User.find({}).populate('savedBooks');
@@ -21,9 +21,14 @@ const resolvers = {
       return theUser;
     },
     userByName: async (parent, { username }) => {
-      console.log('Query.userByName() called:', name);
-      return await User.findOne({ username }).populate('savedBooks');
+      myLog('userByName()');
+      myLog('parent', parent);
+      myLog('username', username);
+      const theUser = await User.findOne({ username }).populate('savedBooks');
+      myLog('theUser', theUser);
+      return theUser;
     },
+    // TODO: The above 3 methods can be removed.
     // savedBooks: async (parent, { username }) => {
     //   console.log('Query.savedBooks() called:', username);
     //   const params = username ? { username } : {};
