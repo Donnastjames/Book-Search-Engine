@@ -27,7 +27,6 @@ const typeDefs = gql`
     users: [User]
     user(id: ID!): User
     userByName(username: String!): User
-    savedBooks: [Book]
     me: User
   }
 
