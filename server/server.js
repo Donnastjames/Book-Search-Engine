@@ -2,7 +2,6 @@ const express = require('express');
 const { ApolloServer } = require("apollo-server-express");
 const path = require('path');
 const db = require('./config/connection');
-const routes = require('./routes');
 const { typeDefs, resolvers } = require('./schemas');
 const { authMiddleware } = require('./utils/auth');
 const app = express();
@@ -23,9 +22,6 @@ app.use(express.json());
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../client/build')));
 }
-
-// TODO: Comment this out?
-app.use(routes);
 
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "../client/build/index.html"));
