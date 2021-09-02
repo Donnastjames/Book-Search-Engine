@@ -65,15 +65,15 @@ const SearchBooks = () => {
     myLog('handleSaveBook()');
     // find the book in `searchedBooks` state by the matching id
     const bookToSave = searchedBooks.find((book) => book.bookId === bookId);
+    myLog('bookToSave', bookToSave);
 
     // get token
     const token = Auth.loggedIn() ? Auth.getToken() : null;
+    myLog('token', token);
 
     if (!token) {
       return false;
     }
-
-    myLog('bookToSave', bookToSave);
 
     try {
       // const response = await saveBook(bookToSave, token);
@@ -82,8 +82,9 @@ const SearchBooks = () => {
           bookInput: bookToSave,
         },
       });
-
-      if (!response.ok) {
+      myLog('response', response);
+      const { data: { saveBook: userWithSavedBook } } = response;
+      if (!userWithSavedBook) {
         throw new Error('something went wrong!');
       }
 
