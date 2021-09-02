@@ -29,15 +29,12 @@ const resolvers = {
       return theUser;
     },
     // TODO: The above 3 methods can be removed.
-    // savedBooks: async (parent, { username }) => {
-    //   console.log('Query.savedBooks() called:', username);
-    //   const params = username ? { username } : {};
-
-    //   return (await User.find(params)).savedBooks;
-    // },
     me: async (parent, args, context) => {
-      console.log('Query.me() called:', context);
+      myLog('me()');
+      myLog('context', context);
       if (context.user) {
+        const myUser = await User.findOne({ _id: context.user._id }).populate('savedBooks');
+        myLog('myUser', myUser);
         return await User.findOne({ _id: context.user._id }).populate('savedBooks');
       }
       throw new AuthenticationError('You need to be logged in!');
@@ -45,10 +42,15 @@ const resolvers = {
   },
 
   Mutation: {
-    createUser: async (parent, { username, email, password }) => {
-      console.log('createUser() called', username, email, password);
+    addUser: async (parent, { username, email, password }) => {
+      myLog('addUser()');
+      myLog('username', username);
+      myLog('email', email);
+      myLog('password', password);
       const user = await User.create({ username, email, password });
+      myLog('user', user);
       const token = signToken(user);
+      myLog('token', token);
       return { token, user };
     },
     login: async (parent, { email, password }) => {
