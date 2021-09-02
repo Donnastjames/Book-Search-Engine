@@ -75,8 +75,6 @@ const SearchBooks = () => {
 
     myLog('bookToSave', bookToSave);
 
-    // throw new Error("I just failed!");
-
     try {
       // const response = await saveBook(bookToSave, token);
       const response = await saveBook({

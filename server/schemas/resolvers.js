@@ -72,6 +72,7 @@ const resolvers = {
       }
 
       const token = signToken(user);
+      myLog('token', token);
 
       return { token, user };
     },
