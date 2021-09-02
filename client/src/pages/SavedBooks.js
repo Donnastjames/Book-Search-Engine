@@ -11,7 +11,7 @@ import { myLog } from '../utils/my_utils';
 
 const SavedBooks = () => {
   myLog('SavedBooks component');
-  const { data: { me: userData }, loading, error } = useQuery(GET_ME);
+  const { data: userData, loading, error } = useQuery(GET_ME);
   myLog('userData', userData);
   myLog('loading', loading);
   myLog('error', error);
@@ -52,7 +52,7 @@ const SavedBooks = () => {
     return <h2>LOADING...</h2>;
   }
 
-  const savedBooks = (userData && userData.savedBooks) || [];
+  const savedBooks = (userData && userData.me && userData.me.savedBooks) || [];
 
   return (
     <>
