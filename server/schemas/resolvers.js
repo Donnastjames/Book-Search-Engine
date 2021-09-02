@@ -78,33 +78,40 @@ const resolvers = {
     saveBook: async (
       parent,
       {
-        authors,
-        description,
-        bookId,
-        image,
-        link,
-        title,
-      },
-      context,
-    ) => {
-      console.log('saveBook() called:', authors, description, bookId, image, link, title);
-      if (context.user) {
-        // MongoDB "push" instead of create
-        const book = new bookSchema({
+        bookInput: {
           authors,
           description,
+          title,
           bookId,
           image,
           link,
+        },
+      },
+      context,
+    ) => {
+      myLog('saveBook()');
+      myLog('authors', authors);
+      myLog('description', description);
+      myLog('title', title);
+      myLog('bookId', bookId);
+      myLog('image', image);
+      myLog('link', link);
+      if (context.user) {
+        const book = {
+          bookId,
+          authors,
+          description,
           title,
-        });
-
+          image,
+          link,
+        };
+        myLog('book', book);
         const updatedUser = await User.findOneAndUpdate(
           { _id: context.user._id },
           { $addToSet: { savedBooks: book } },
           { new: true, runValidators: true },
         );
-
+        myLog('updatedUser', updatedUser);
         return updatedUser;
       }
       throw new AuthenticationError('You need to be logged in!');
@@ -118,6 +125,49 @@ const resolvers = {
           { new: true },
         );
 
+        return updatedUser;
+      }
+      throw new AuthenticationError('You need to be logged in!');
+    },
+    // TODO: The following is for debugging and can be removed ...
+    saveBookForUser: async (
+      parent,
+      {
+        userId,
+        bookInput: {
+          authors,
+          description,
+          title,
+          bookId,
+          image,
+          link,
+        },
+      },
+      context,
+    ) => {
+      myLog('saveBookForUser()', userId);
+      myLog('authors', authors);
+      myLog('description', description);
+      myLog('title', title);
+      myLog('bookId', bookId);
+      myLog('image', image);
+      myLog('link', link);
+      if (userId) {
+        const book = {
+          bookId,
+          authors,
+          description,
+          title,
+          image,
+          link,
+        };
+        myLog('book', book);
+        const updatedUser = await User.findOneAndUpdate(
+          { _id: userId },
+          { $addToSet: { savedBooks: book } },
+          { new: true, runValidators: true },
+        );
+        myLog('updatedUser', updatedUser);
         return updatedUser;
       }
       throw new AuthenticationError('You need to be logged in!');
