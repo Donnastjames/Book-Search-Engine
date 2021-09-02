@@ -83,8 +83,8 @@ const SearchBooks = () => {
         },
       });
       myLog('response', response);
-      const { data: { saveBook: userWithSavedBook } } = response;
-      if (!userWithSavedBook) {
+      const { data: { saveBook: updatedUser } } = response;
+      if (!updatedUser) {
         throw new Error('something went wrong!');
       }
 

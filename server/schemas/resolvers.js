@@ -31,7 +31,6 @@ const resolvers = {
     // TODO: The above 3 methods can be removed.
     me: async (parent, args, context) => {
       myLog('me()');
-      myLog('context', context);
       if (context.user) {
         const myUser = await User.findOne({ _id: context.user._id }).populate('savedBooks');
         myLog('myUser', myUser);
