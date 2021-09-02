@@ -9,7 +9,11 @@ import { SAVE_BOOK } from '../utils/mutations';
 import { myLog } from '../utils/my_utils';
 
 const SearchBooks = () => {
-  const [saveBook] = useMutation(SAVE_BOOK);
+  myLog('SearchBooks component');
+  const [saveBook, { data, loading, error }] = useMutation(SAVE_BOOK);
+  myLog('data', data);
+  myLog('loading', loading);
+  myLog('error', error);
   // create state for holding returned google api data
   const [searchedBooks, setSearchedBooks] = useState([]);
   // create state for holding our search field data
