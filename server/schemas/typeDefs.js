@@ -24,9 +24,6 @@ const typeDefs = gql`
   }
 
   type Query {
-    users: [User]
-    user(id: ID!): User
-    userByName(username: String!): User
     me: User
   }
 
